@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ video.title }}</title>
+</head>
+<body>
+    <h2>{{ video.title }}</h2>
+    
+    <video id="videoPlayer" controls>
+        <source src="{{ video.video_file.url }}" type="video/mp4" style="width: 1200px; height: 400px;">
+        <track src="{{ subtitle_track }}" kind="subtitles" srclang="en" label="English" default>
+    </video>
+
+    <form method="get" action="">
+        <input type="text" name="q" placeholder="Search subtitles" value="{{ request.GET.q }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <ul>
+        {% for subtitle in subtitles %}
+        <li>
+            {{ subtitle.content }} <a href="#" onclick="playFrom({{ subtitle.start_time }})">{{ subtitle.start_time }} Sec</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'list_videos' %}">View All Videos</a><br>
+
+    <a href="{% url 'upload_video' %}">Upload New Video</a>
+
+
+    <script>
+        function playFrom(timestamp) {
+            var video = document.getElementById("videoPlayer");
+        
+            // Wait until the metadata is loaded before setting the time
+            /*var seekable = video.seekable;
+
+            function checkSeekable() {
+                var seekable = video.seekable;
+
+                if (seekable.length > 0) {
+                    // Check if the timestamp is within a seekable range
+                    if (timestamp >= seekable.start(0) && timestamp <= seekable.end(0)) {
+                        video.currentTime = timestamp;
+                        video.play();
+                        console.log("Seeked to", video.currentTime);
+                    } else {
+                        console.log("The requested time is not in a seekable range yet. Buffering...");
+                        // Keep checking until it's seekable
+                        setTimeout(checkSeekable, 5000); // Check every 500ms
+                    }
+                } else {
+                    console.log("No seekable range available yet. Buffering...");
+                    setTimeout(checkSeekable, 5000); // Check every 500ms
+                }
+            }
+
+            // Start checking for seekable ranges after metadata is loaded
+            if (video.readyState >= 1) {
+                checkSeekable(); // Start checking if already loaded
+            } else {
+                video.addEventListener('loadedmetadata', checkSeekable);
+            }*/
+            video.currentTime = timestamp;  // Set the time to seek
+            console.log("Attempting to set currentTime to:", timestamp);
+
+            // Ensure the video plays from the specified time
+            video.addEventListener('timeupdate', function() {
+                console.log("Video currentTime is now:", video.currentTime);
+            });
+
+            video.play();
+        }
+        </script>
+</body>
+</html>
